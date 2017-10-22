@@ -21,6 +21,7 @@ public class Main {
 	static ArrayList<Point> listVisite;
 	static boolean end = false;
 	static boolean impossible = false;
+	static String listChemin ="";
 	/**
 	 * Méthode main du programme
 	 * @param args
@@ -35,14 +36,12 @@ public class Main {
 		chercherPoint();
 		if(impossible) {
 			System.out.println("Impossible a résoudre");
+			System.exit(-1);
 		}
-	}
-
-	private static void afficherListPoint() {
-		TriListe(listPotentielDeNoeud);
-		for (int i = 0; i < listPotentielDeNoeud.size(); i++) {
-			System.out.println(" x : "+listPotentielDeNoeud.get(i).positionx + " y : "+listPotentielDeNoeud.get(i).positiony+"  avec comme valeur : "+listPotentielDeNoeud.get(i).fCost);
+		else {
+			System.out.println("Fin du programme !");
 		}
+		
 	}
 
 	/**
@@ -149,22 +148,26 @@ public class Main {
 
 		while(!end) {
 			TriListe(listPotentielDeNoeud);
+			//affiche l'ensemble des points pouvant avoir un chemins qui va jusqu au point final
 			for (int i = 0; i < listPotentielDeNoeud.size(); i++) {
 				System.out.println("coordonné du point : "+listPotentielDeNoeud.get(i).positionx+" "+listPotentielDeNoeud.get(i).positiony+" avec comme gCost : "+listPotentielDeNoeud.get(i).gCost+" + hCost : "+listPotentielDeNoeud.get(i).hCost+" = fCost : "+listPotentielDeNoeud.get(i).fCost);
 			}
 			System.out.println("");
+			
+			//s'il n'y a pas/plus de noeud potentiel, on en déduit que le parcours est impossible
 			if(listPotentielDeNoeud.isEmpty()) {
 				impossible  = true;
 				break;
 			}
+			//si le noeud en haut de la liste de noeud potentiel est l'arrivée alors on affiche ses coordonnées, la liste de tout les autres points que l'on a parcourut avant d'y arriver et on arrete la boucle
 			if(listPotentielDeNoeud.get(0).status == 1) {
 				end=true;
 				System.out.println("coordonné du point Final : "+listPotentielDeNoeud.get(0).positionx+" "+listPotentielDeNoeud.get(0).positiony+" avec comme valeur : "+listPotentielDeNoeud.get(0).gCost+" ");
 				System.out.println("liste du chemin de l'arrive vers le depart :");
 				for (int i = 0; i < listPotentielDeNoeud.get(0).pointVisite.size(); i++) {
-					System.out.println("x : "+listPotentielDeNoeud.get(0).positionx+" y : "+listPotentielDeNoeud.get(0).positiony);
 					getListVisiter(listPotentielDeNoeud.get(0));
-
+					listChemin +=" x : "+listPotentielDeNoeud.get(0).positionx+" y : "+listPotentielDeNoeud.get(0).positiony;
+					System.out.println(listChemin);
 				}
 				break;
 			}
@@ -173,6 +176,7 @@ public class Main {
 			checkNode(listPotentielDeNoeud.get(0),a);//on regarde en carre les voisins de ce noeud
 			listVisite.add(listPotentielDeNoeud.get(0));//on ajout le noeud qu on va regarder dans la liste des noeuds deja visité
 
+			//Affiche les index
 			for (int i = 0; i < listVisite.size(); i++) {
 				System.out.println(" index i :"+i+ "  "+listVisite.get(i).positionx +","+listVisite.get(i).positiony+" valeur gCost : "+listVisite.get(i).gCost+" valeur hCost : "+listVisite.get(i).hCost+" = valeur fCost "+listVisite.get(i).fCost);
 			}
@@ -183,18 +187,20 @@ public class Main {
 	}
 
 	/**
-	 * affiche le chemin pris rejoindre le point d'arrive
+	 * Méthode ^permettant d'afficher le chemin prit pour rejoindre le point d'arrivee
 	 * @param p
 	 */
 	private static void getListVisiter(Point p) {
-		if(p.pointVisite.isEmpty());
+		if(p.pointVisite.isEmpty()) listChemin+=" ";
 		else {
-			System.out.println("x : "+p.pointVisite.get(0).positionx+" y : "+p.pointVisite.get(0).positiony);
 			getListVisiter(p.pointVisite.get(0));
+			for (int i = 0; i < p.pointVisite.size(); i++) {
+				listChemin +="x :"+p.pointVisite.get(i).positionx+" y :"+p.pointVisite.get(i).positiony+" ,";
+			}
+			
 		}
-		
 	}
-
+	
 	/**
 	 * Méthode permettant de regarder le parcours du point paraissant le plus interessant
 	 * @param point
@@ -278,7 +284,7 @@ public class Main {
 	}
 
 	/**
-	 * Méthode permetant d'obtenir l'heristique d'un point vers l'arrivé
+	 * Méthode permetant d'obtenir l'heristique d'un point vers l'arrivée
 	 * @param d
 	 * @param a
 	 * @return
@@ -323,11 +329,11 @@ public class Main {
 
 
 	/**
-	 * Méthode permettant de generer des murs aléatoirement sur la carte
+	 * Méthode permettant de generer des murs aléatoirement sur la carte (entre 0 et 50)
 	 */
 	private static void randomMur() {
 		Random r = new Random();
-		int c = r.nextInt(25);
+		int c = r.nextInt(50);
 		int a = 0;
 		int b = 0;
 		System.out.println("valeur de c : "+c);
@@ -341,10 +347,8 @@ public class Main {
 		System.out.println("");
 	}
 
-
-
 	/**
-	 * Méthode générant les contour de la carte
+	 * Méthode générant les contours de la carte
 	 */
 	private static void generateContour() {
 		Point point;
@@ -386,56 +390,4 @@ public class Main {
 			System.out.println("");
 		}
 	}
-	/**
-	 * Méthode permettant d'afficher le resultat de la recherche sur la carte
-	 */
-	private static void afficherResultat() {
-		if (listNoeudSucces.isEmpty()) {
-			System.out.println("Impossible de realiser ce chemin !");
-
-		}
-		else {
-			for(int i = 0;i<listNoeudSucces.size();i=i+3) {
-				System.out.println("coordonné du point : "+listNoeudSucces.get(i)+" "+listNoeudSucces.get(i+1)+" avec comme valeur : "+listNoeudSucces.get(i+2)+" ");
-				System.out.print("Historique du chemin : ");
-				for (int j = 0; j < list[listNoeudSucces.get(i)][listNoeudSucces.get(i+1)].pointVisite.size(); j++) {
-					System.out.print("  "+list[listNoeudSucces.get(i)][listNoeudSucces.get(i+1)].pointVisite.get(j).positionx+" "+list[listNoeudSucces.get(i)][listNoeudSucces.get(i+1)].pointVisite.get(j).positiony);
-				}
-				System.out.println("");
-
-			}
-		}
-	}
-
-	/*
-	private static void test() {
-		Random r = new Random();
-		int a = 0;
-		for (int i = 0; i < list.length; i++) {
-			a = r.nextInt(10);
-			System.out.println(a);
-		}
-
-	}*/
-
-
-	//	/**
-	//	 * Méthode generant un nombre aléatoire (vu que j'ai pas internet je sais plus comment faire plus simple ...)
-	//	 * @param x
-	//	 * @param y
-	//	 * @return
-	//	 */
-	//	private static int generateRand(int x, int y) {
-	//		Random rand = new Random();
-	//		int a = 0;
-	//		boolean bol = false;
-	//		while (!bol) {
-	//			a = rand.nextInt();
-	//			if(a<y && a>=x) {
-	//				bol = true;
-	//			}
-	//		}
-	//		return a;
-	//	}
-
 }
